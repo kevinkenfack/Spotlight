@@ -4,7 +4,7 @@ Spotlight is a [Tailwind UI](https://tailwindui.com) site template built using [
 
 ## Getting started
 
-To get started with this template, first clone and install the npm dependencies:
+To get started with this template, first clone repo and install the npm dependencies:
 
 ```bash
 git clone https://github.com/kevinkenfack/Spotlight.git
