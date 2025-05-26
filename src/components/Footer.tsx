@@ -1,8 +1,15 @@
-import Link from 'next/link'
+import Link, { LinkProps } from 'next/link' // Import LinkProps
+import React from 'react' // Import React
 
 import { Container } from '@/components/Container'
 
-function NavLink({ href, children }) {
+// Props for NavLink component
+interface NavLinkProps {
+  href: LinkProps['href']; // Use LinkProps['href'] for better type safety
+  children: React.ReactNode;
+}
+
+const NavLink: React.FC<NavLinkProps> = ({ href, children }) => {
   return (
     <Link
       href={href}
@@ -13,7 +20,7 @@ function NavLink({ href, children }) {
   )
 }
 
-export function Footer() {
+export const Footer: React.FC = () => { // Type Footer as React.FC
   return (
     <footer className="mt-32">
       <Container.Outer>

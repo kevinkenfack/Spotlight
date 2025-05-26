@@ -1,7 +1,13 @@
-import { useId } from 'react'
+import React, { useId } from 'react' // Import React
 
-export function Section({ title, children }) {
-  let id = useId()
+// Define props for the Section component
+interface SectionProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+export const Section: React.FC<SectionProps> = ({ title, children }) => {
+  const id = useId()
 
   return (
     <section

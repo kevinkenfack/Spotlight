@@ -1,7 +1,9 @@
-import Image from 'next/image'
+import Image, { StaticImageData } from 'next/image'
 import Head from 'next/head'
-import Link from 'next/link'
+import Link, { LinkProps } from 'next/link'
 import clsx from 'clsx'
+import React from 'react' // Import React
+import type { GetStaticProps, NextPage } from 'next'
 
 import { Button } from '@/components/Button'
 import { Card } from '@/components/Card'
@@ -11,21 +13,52 @@ import {
   InstagramIcon,
   GitHubIcon,
   LinkedInIcon,
-} from '@/components/SocialIcons'
+} from '@/components/SocialIcons' // Already typed FCs
 import image1 from '@/images/photos/image-1.jpg'
 import image2 from '@/images/photos/image-2.jpg'
 import image3 from '@/images/photos/image-3.jpg'
 import image4 from '@/images/photos/image-4.jpg'
 import image5 from '@/images/photos/image-5.jpg'
-import logoAirbnb from '@/images/logos/airbnb.svg'
+import logoAirbnb from '@/images/logos/airbnb.svg' // SVGs can be StaticImageData or string if used as src
 import logoFacebook from '@/images/logos/facebook.svg'
 import logoPlanetaria from '@/images/logos/planetaria.svg'
 import logoStarbucks from '@/images/logos/starbucks.svg'
-import { generateRssFeed } from '@/lib/generateRssFeed'
-import { getAllArticles } from '@/lib/getAllArticles'
-import { formatDate } from '@/lib/formatDate'
+import { generateRssFeed } from '@/lib/generateRssFeed' // Already typed
+import { getAllArticles, Article as FullArticle } from '@/lib/getAllArticles' // Already typed
+import { formatDate } from '@/lib/formatDate' // Already typed
 
-function MailIcon(props) {
+// --- Type Definitions ---
+
+type SVGIconProps = React.SVGProps<SVGSVGElement>;
+type ArticleForPage = Omit<FullArticle, 'component'>;
+
+interface ArticleComponentProps {
+  article: ArticleForPage;
+}
+
+interface SocialLinkProps extends Omit<LinkProps, 'children'> {
+  icon: React.ComponentType<SVGIconProps>;
+  href: string; // Ensure href is always a string for Link
+  'aria-label': string; // For accessibility
+}
+
+type ResumeDate = string | { label: string; dateTime: string | number };
+
+interface Role {
+  company: string;
+  title: string;
+  logo: StaticImageData | string; // SVGs imported as components might be different, but here they are image src
+  start: ResumeDate;
+  end: ResumeDate;
+}
+
+interface HomeProps {
+  articles: ArticleForPage[];
+}
+
+// --- Icon Components ---
+
+const MailIcon: React.FC<SVGIconProps> = (props) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -48,7 +81,7 @@ function MailIcon(props) {
   )
 }
 
-function BriefcaseIcon(props) {
+const BriefcaseIcon: React.FC<SVGIconProps> = (props) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -71,7 +104,7 @@ function BriefcaseIcon(props) {
   )
 }
 
-function ArrowDownIcon(props) {
+const ArrowDownIcon: React.FC<SVGIconProps> = (props) => {
   return (
     <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" {...props}>
       <path
@@ -84,7 +117,9 @@ function ArrowDownIcon(props) {
   )
 }
 
-function Article({ article }) {
+// --- Sub-Components ---
+
+const Article: React.FC<ArticleComponentProps> = ({ article }) => {
   return (
     <Card as="article">
       <Card.Title href={`/articles/${article.slug}`}>
@@ -99,7 +134,7 @@ function Article({ article }) {
   )
 }
 
-function SocialLink({ icon: Icon, ...props }) {
+const SocialLink: React.FC<SocialLinkProps> = ({ icon: Icon, ...props }) => {
   return (
     <Link className="group -m-1 p-1" {...props}>
       <Icon className="h-6 w-6 fill-zinc-500 transition group-hover:fill-zinc-600 dark:fill-zinc-400 dark:group-hover:fill-zinc-300" />
@@ -107,7 +142,7 @@ function SocialLink({ icon: Icon, ...props }) {
   )
 }
 
-function Newsletter() {
+const Newsletter: React.FC = () => {
   return (
     <form
       action="/thank-you"
@@ -136,8 +171,8 @@ function Newsletter() {
   )
 }
 
-function Resume() {
-  let resume = [
+const Resume: React.FC = () => {
+  const resume: Role[] = [
     {
       company: 'Planetaria',
       title: 'CEO',
@@ -171,6 +206,20 @@ function Resume() {
     },
   ]
 
+  function getDateTime(dateObj: ResumeDate): string | number {
+    if (typeof dateObj === 'string') {
+      return dateObj;
+    }
+    return dateObj.dateTime;
+  }
+
+  function getLabel(dateObj: ResumeDate): string {
+    if (typeof dateObj === 'string') {
+      return dateObj;
+    }
+    return dateObj.label;
+  }
+
   return (
     <div className="rounded-2xl border border-zinc-100 p-6 dark:border-zinc-700/40">
       <h2 className="flex text-sm font-semibold text-zinc-900 dark:text-zinc-100">
@@ -181,7 +230,8 @@ function Resume() {
         {resume.map((role, roleIndex) => (
           <li key={roleIndex} className="flex gap-4">
             <div className="relative mt-1 flex h-10 w-10 flex-none items-center justify-center rounded-full shadow-md shadow-zinc-800/5 ring-1 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0">
-              <Image src={role.logo} alt="" className="h-7 w-7" unoptimized />
+              {/* Ensure role.logo is string for Image src, or handle StaticImageData correctly */}
+              <Image src={role.logo as string} alt="" className="h-7 w-7" unoptimized />
             </div>
             <dl className="flex flex-auto flex-wrap gap-x-2">
               <dt className="sr-only">Company</dt>
@@ -195,16 +245,14 @@ function Resume() {
               <dt className="sr-only">Date</dt>
               <dd
                 className="ml-auto text-xs text-zinc-400 dark:text-zinc-500"
-                aria-label={`${role.start.label ?? role.start} until ${
-                  role.end.label ?? role.end
-                }`}
+                aria-label={`${getLabel(role.start)} until ${getLabel(role.end)}`}
               >
-                <time dateTime={role.start.dateTime ?? role.start}>
-                  {role.start.label ?? role.start}
+                <time dateTime={String(getDateTime(role.start))}>
+                  {getLabel(role.start)}
                 </time>{' '}
                 <span aria-hidden="true">—</span>{' '}
-                <time dateTime={role.end.dateTime ?? role.end}>
-                  {role.end.label ?? role.end}
+                <time dateTime={String(getDateTime(role.end))}>
+                  {getLabel(role.end)}
                 </time>
               </dd>
             </dl>
@@ -219,15 +267,16 @@ function Resume() {
   )
 }
 
-function Photos() {
-  let rotations = ['rotate-2', '-rotate-2', 'rotate-2', 'rotate-2', '-rotate-2']
+const Photos: React.FC = () => {
+  const rotations: string[] = ['rotate-2', '-rotate-2', 'rotate-2', 'rotate-2', '-rotate-2']
+  const images: StaticImageData[] = [image1, image2, image3, image4, image5];
 
   return (
     <div className="mt-16 sm:mt-20">
       <div className="-my-4 flex justify-center gap-5 overflow-hidden py-4 sm:gap-8">
-        {[image1, image2, image3, image4, image5].map((image, imageIndex) => (
+        {images.map((image, imageIndex) => (
           <div
-            key={image.src}
+            key={image.src} // image.src is available on StaticImageData
             className={clsx(
               'relative aspect-[9/10] w-44 flex-none overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-800 sm:w-72 sm:rounded-2xl',
               rotations[imageIndex % rotations.length]
@@ -246,7 +295,9 @@ function Photos() {
   )
 }
 
-export default function Home({ articles }) {
+// --- Home Page Component ---
+
+const Home: NextPage<HomeProps> = ({ articles }) => {
   return (
     <>
       <Head>
@@ -311,16 +362,20 @@ export default function Home({ articles }) {
   )
 }
 
-export async function getStaticProps() {
+export default Home;
+
+export const getStaticProps: GetStaticProps<HomeProps> = async () => {
   if (process.env.NODE_ENV === 'production') {
     await generateRssFeed()
   }
 
+  const articles = (await getAllArticles())
+    .slice(0, 4)
+    .map(({ component, ...meta }): ArticleForPage => meta);
+
   return {
     props: {
-      articles: (await getAllArticles())
-        .slice(0, 4)
-        .map(({ component, ...meta }) => meta),
+      articles,
     },
   }
 }

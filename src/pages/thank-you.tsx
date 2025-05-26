@@ -1,8 +1,10 @@
 import Head from 'next/head'
+import React from 'react' // Import React
+import type { NextPage } from 'next'
 
-import { SimpleLayout } from '@/components/SimpleLayout'
+import { SimpleLayout } from '@/components/SimpleLayout' // Already typed
 
-export default function ThankYou() {
+const ThankYou: NextPage = () => { // This page doesn't have custom props
   return (
     <>
       <Head>
@@ -19,3 +21,5 @@ export default function ThankYou() {
     </>
   )
 }
+
+export default ThankYou;

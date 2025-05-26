@@ -1,11 +1,27 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
+import React from 'react' // Import React
 
 import { Container } from '@/components/Container'
 import { formatDate } from '@/lib/formatDate'
 import { Prose } from '@/components/Prose'
 
-function ArrowLeftIcon(props) {
+// Define props for meta data
+interface ArticleMetaProps {
+  title: string;
+  description: string;
+  date: string; // Should be a string that formatDate can parse
+}
+
+// Define props for ArticleLayout component
+interface ArticleLayoutProps {
+  children: React.ReactNode;
+  meta: ArticleMetaProps;
+  isRssFeed?: boolean;
+  previousPathname?: string;
+}
+
+function ArrowLeftIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" {...props}>
       <path
@@ -18,16 +34,18 @@ function ArrowLeftIcon(props) {
   )
 }
 
-export function ArticleLayout({
+export const ArticleLayout: React.FC<ArticleLayoutProps> = ({
   children,
   meta,
   isRssFeed = false,
   previousPathname,
-}) {
-  let router = useRouter()
+}) => {
+  const router = useRouter()
 
   if (isRssFeed) {
-    return children
+    // When isRssFeed is true, children are expected to be the full RSS item content.
+    // React.ReactNode is broad; if children must be specific (e.g. JSX.Element), adjust type.
+    return <>{children}</> 
   }
 
   return (
@@ -55,13 +73,14 @@ export function ArticleLayout({
                   {meta.title}
                 </h1>
                 <time
-                  dateTime={meta.date}
+                  dateTime={meta.date} // meta.date is already a string
                   className="order-first flex items-center text-base text-zinc-400 dark:text-zinc-500"
                 >
                   <span className="h-4 w-0.5 rounded-full bg-zinc-200 dark:bg-zinc-500" />
                   <span className="ml-3">{formatDate(meta.date)}</span>
                 </time>
               </header>
+              {/* Ensure Prose component can accept React.ReactNode children */}
               <Prose className="mt-8">{children}</Prose>
             </article>
           </div>

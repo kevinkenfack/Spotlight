@@ -1,7 +1,8 @@
 import Image from 'next/image'
 import Head from 'next/head'
-import Link from 'next/link'
+import Link, { LinkProps } from 'next/link'
 import clsx from 'clsx'
+import React from 'react' // Import React
 
 import { Container } from '@/components/Container'
 import {
@@ -9,10 +10,26 @@ import {
   InstagramIcon,
   GitHubIcon,
   LinkedInIcon,
-} from '@/components/SocialIcons'
+} from '@/components/SocialIcons' // These are already typed FCs
 import portraitImage from '@/images/portrait.jpg'
 
-function SocialLink({ className, href, children, icon: Icon }) {
+// --- Type Definitions ---
+
+interface SocialLinkProps {
+  className?: string;
+  href: LinkProps['href'];
+  children: React.ReactNode;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+}
+
+// --- Component Definitions ---
+
+const SocialLink: React.FC<SocialLinkProps> = ({
+  className,
+  href,
+  children,
+  icon: Icon,
+}) => {
   return (
     <li className={clsx(className, 'flex')}>
       <Link
@@ -26,7 +43,7 @@ function SocialLink({ className, href, children, icon: Icon }) {
   )
 }
 
-function MailIcon(props) {
+const MailIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
       <path
@@ -37,7 +54,8 @@ function MailIcon(props) {
   )
 }
 
-export default function About() {
+// About page component
+const About: React.FC = () => { // Type as React.FC, assumes no specific page props like getStaticProps etc.
   return (
     <>
       <Head>
@@ -121,3 +139,5 @@ export default function About() {
     </>
   )
 }
+
+export default About;

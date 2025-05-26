@@ -1,18 +1,52 @@
 import Head from 'next/head'
+import React from 'react' // Import React
+import type { NextPage } from 'next'
 
-import { Card } from '@/components/Card'
-import { Section } from '@/components/Section'
-import { SimpleLayout } from '@/components/SimpleLayout'
+import { Card } from '@/components/Card' // Already typed
+import { Section } from '@/components/Section' // Already typed
+import { SimpleLayout } from '@/components/SimpleLayout' // Already typed
 
-function SpeakingSection({ children, ...props }) {
+// --- Type Definitions ---
+
+interface SpeakingSectionProps {
+  title: string;
+  children: React.ReactNode;
+  // SectionProps are { title: string; children: React.ReactNode; }
+  // Passing ...props to Section means we are passing title and children.
+  // Since title is explicit, we can omit it from what ...props might contain for clarity,
+  // but Section component itself only expects title and children.
+  // Other HTML attributes would only apply if Section rendered a native HTML element directly.
+  // For simplicity, we can assume ...props doesn't add anything beyond what Section expects.
+}
+
+const SpeakingSection: React.FC<SpeakingSectionProps> = ({
+  children,
+  title,
+  ...props // props will be passed to Section, which expects 'title' and 'children'
+}) => {
+  // Pass the title explicitly to Section. Any other props in ...props would be passed too.
   return (
-    <Section {...props}>
+    <Section title={title} {...props}>
       <div className="space-y-16">{children}</div>
     </Section>
   )
 }
 
-function Appearance({ title, description, event, cta, href }) {
+interface AppearanceProps {
+  title: string;
+  description: string;
+  event: string;
+  cta: string;
+  href: string; // Assuming href is always a string for Card.Title
+}
+
+const Appearance: React.FC<AppearanceProps> = ({
+  title,
+  description,
+  event,
+  cta,
+  href,
+}) => {
   return (
     <Card as="article">
       <Card.Title as="h3" href={href}>
@@ -25,7 +59,7 @@ function Appearance({ title, description, event, cta, href }) {
   )
 }
 
-export default function Speaking() {
+const Speaking: NextPage = () => { // This page doesn't have custom props
   return (
     <>
       <Head>
@@ -42,14 +76,14 @@ export default function Speaking() {
         <div className="space-y-20">
           <SpeakingSection title="Conferences">
             <Appearance
-              href="#"
+              href="#" // Placeholder link
               title="In space, no one can watch you stream — until now"
               description="A technical deep-dive into HelioStream, the real-time streaming library I wrote for transmitting live video back to Earth."
               event="SysConf 2021"
               cta="Watch video"
             />
             <Appearance
-              href="#"
+              href="#" // Placeholder link
               title="Lessons learned from our first product recall"
               description="They say that if you’re not embarassed by your first version, you’re doing it wrong. Well when you’re selling DIY space shuttle kits it turns out it’s a bit more complicated."
               event="Business of Startups 2020"
@@ -58,21 +92,21 @@ export default function Speaking() {
           </SpeakingSection>
           <SpeakingSection title="Podcasts">
             <Appearance
-              href="#"
+              href="#" // Placeholder link
               title="Using design as a competitive advantage"
               description="How we used world-class visual design to attract a great team, win over customers, and get more press for Planetaria."
               event="Encoding Design, July 2022"
               cta="Listen to podcast"
             />
             <Appearance
-              href="#"
+              href="#" // Placeholder link
               title="Bootstrapping an aerospace company to $17M ARR"
               description="The story of how we built one of the most promising space startups in the world without taking any capital from investors."
               event="The Escape Velocity Show, March 2022"
               cta="Listen to podcast"
             />
             <Appearance
-              href="#"
+              href="#" // Placeholder link
               title="Programming your company operating system"
               description="On the importance of creating systems and processes for running your business so that everyone on the team knows how to make the right decision no matter the situation."
               event="How They Work Radio, September 2021"
@@ -84,3 +118,5 @@ export default function Speaking() {
     </>
   )
 }
+
+export default Speaking;

@@ -1,5 +1,7 @@
-import Image from 'next/image'
+import Image, { StaticImageData } from 'next/image'
 import Head from 'next/head'
+import React from 'react' // Import React
+import type { NextPage } from 'next'
 
 import { Card } from '@/components/Card'
 import { SimpleLayout } from '@/components/SimpleLayout'
@@ -9,7 +11,19 @@ import logoHelioStream from '@/images/logos/helio-stream.svg'
 import logoOpenShuttle from '@/images/logos/open-shuttle.svg'
 import logoPlanetaria from '@/images/logos/planetaria.svg'
 
-const projects = [
+// --- Type Definitions ---
+
+interface Project {
+  name: string;
+  description: string;
+  link: {
+    href: string;
+    label: string;
+  };
+  logo: StaticImageData | string; // StaticImageData for imported images, string for URLs
+}
+
+const projectsData: Project[] = [
   {
     name: 'Planetaria',
     description:
@@ -21,7 +35,7 @@ const projects = [
     name: 'Animaginary',
     description:
       'High performance web animation library, hand-written in optimized WASM.',
-    link: { href: '#', label: 'github.com' },
+    link: { href: '#', label: 'github.com' }, // Assuming # is a placeholder for actual link
     logo: logoAnimaginary,
   },
   {
@@ -47,7 +61,7 @@ const projects = [
   },
 ]
 
-function LinkIcon(props) {
+const LinkIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
       <path
@@ -58,7 +72,7 @@ function LinkIcon(props) {
   )
 }
 
-export default function Projects() {
+const Projects: NextPage = () => { // This page doesn't have custom props from getStaticProps etc.
   return (
     <>
       <Head>
@@ -76,14 +90,14 @@ export default function Projects() {
           role="list"
           className="grid grid-cols-1 gap-x-12 gap-y-16 sm:grid-cols-2 lg:grid-cols-3"
         >
-          {projects.map((project) => (
+          {projectsData.map((project) => (
             <Card as="li" key={project.name}>
               <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-md shadow-zinc-800/5 ring-1 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0">
                 <Image
                   src={project.logo}
                   alt=""
                   className="h-8 w-8"
-                  unoptimized
+                  unoptimized // Good to note for type considerations, though StaticImageData is fine
                 />
               </div>
               <h2 className="mt-6 text-base font-semibold text-zinc-800 dark:text-zinc-100">
@@ -101,3 +115,5 @@ export default function Projects() {
     </>
   )
 }
+
+export default Projects;

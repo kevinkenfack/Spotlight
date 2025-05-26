@@ -1,12 +1,27 @@
 import Head from 'next/head'
+import React from 'react' // Import React
+import type { NextPage } from 'next'
 
-import { Card } from '@/components/Card'
-import { Section } from '@/components/Section'
-import { SimpleLayout } from '@/components/SimpleLayout'
+import { Card } from '@/components/Card' // Already typed
+import { Section } from '@/components/Section' // Already typed
+import { SimpleLayout } from '@/components/SimpleLayout' // Already typed
 
-function ToolsSection({ children, ...props }) {
+// --- Type Definitions ---
+
+interface ToolsSectionProps {
+  title: string;
+  children: React.ReactNode;
+  // As with SpeakingSectionProps, ...props for Section here will primarily pass 'title' and 'children'.
+  // 'title' is explicit, so ...props would be other valid SectionProps if any, or HTML attributes if Section rendered a native element.
+}
+
+const ToolsSection: React.FC<ToolsSectionProps> = ({
+  children,
+  title,
+  ...props // Pass title explicitly to Section component
+}) => {
   return (
-    <Section {...props}>
+    <Section title={title} {...props}>
       <ul role="list" className="space-y-16">
         {children}
       </ul>
@@ -14,7 +29,13 @@ function ToolsSection({ children, ...props }) {
   )
 }
 
-function Tool({ title, href, children }) {
+interface ToolProps {
+  title: string;
+  href?: string; // href is optional for Card.Title
+  children: React.ReactNode; // Represents the description
+}
+
+const Tool: React.FC<ToolProps> = ({ title, href, children }) => {
   return (
     <Card as="li">
       <Card.Title as="h3" href={href}>
@@ -25,7 +46,7 @@ function Tool({ title, href, children }) {
   )
 }
 
-export default function Uses() {
+const Uses: NextPage = () => { // This page doesn't have custom props
   return (
     <>
       <Head>
@@ -117,3 +138,5 @@ export default function Uses() {
     </>
   )
 }
+
+export default Uses;

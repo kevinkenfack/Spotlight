@@ -1,6 +1,7 @@
+import React from 'react' // Import React
 import { Head, Html, Main, NextScript } from 'next/document'
 
-const modeScript = `
+const modeScript: string = `
   let darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
   updateMode()
@@ -35,7 +36,10 @@ const modeScript = `
   }
 `
 
-export default function Document() {
+// Define the Document component as a React Functional Component
+const MyDocument: React.FC = () => {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || '' // Ensure siteUrl is a string
+
   return (
     <Html className="h-full antialiased" lang="en">
       <Head>
@@ -43,12 +47,12 @@ export default function Document() {
         <link
           rel="alternate"
           type="application/rss+xml"
-          href={`${process.env.NEXT_PUBLIC_SITE_URL}/rss/feed.xml`}
+          href={`${siteUrl}/rss/feed.xml`}
         />
         <link
           rel="alternate"
           type="application/feed+json"
-          href={`${process.env.NEXT_PUBLIC_SITE_URL}/rss/feed.json`}
+          href={`${siteUrl}/rss/feed.json`}
         />
       </Head>
       <body className="flex h-full flex-col bg-zinc-50 dark:bg-black">
@@ -58,3 +62,5 @@ export default function Document() {
     </Html>
   )
 }
+
+export default MyDocument
